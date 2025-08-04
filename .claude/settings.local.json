@@ -5,7 +5,9 @@
       "Bash(python -m mypy:*)",
       "Bash(poetry --version)",
       "Bash(poetry install:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(rm:*)",
+      "Bash(poetry lock:*)"
     ],
     "deny": []
   }

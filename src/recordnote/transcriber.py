@@ -1,15 +1,14 @@
-"""Speech-to-text transcription module using OpenAI Whisper."""
+"""Speech-to-text transcription module using Faster Whisper."""
 
 import tempfile
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
-import whisper
-from whisper.model import Whisper
+from faster_whisper import WhisperModel
 
 
 class SpeechTranscriber:
-    """Speech transcriber using OpenAI Whisper for Japanese audio."""
+    """Speech transcriber using Faster Whisper for Japanese audio."""
 
     def __init__(self, model_size: str = "base") -> None:
         """Initialize the speech transcriber.
@@ -18,15 +17,15 @@ class SpeechTranscriber:
             model_size: Whisper model size (tiny, base, small, medium, large)
         """
         self.model_size = model_size
-        self._model: Optional[Whisper] = None
+        self._model: Optional[WhisperModel] = None
 
     def load_model(self) -> None:
         """Load the Whisper model. Called automatically when needed."""
         if self._model is None:
-            print(f"Loading Whisper model: {self.model_size}")
-            self._model = whisper.load_model(self.model_size)
+            print(f"Loading Faster Whisper model: {self.model_size}")
+            self._model = WhisperModel(self.model_size, device="cpu", compute_type="int8")
 
-    def transcribe_file(self, audio_file_path: Path) -> Dict[str, str]:
+    def transcribe_file(self, audio_file_path: Path) -> Dict[str, Any]:
         """Transcribe audio file to text.
 
         Args:
@@ -42,24 +41,29 @@ class SpeechTranscriber:
         assert self._model is not None
 
         # Transcribe with Japanese language specified
-        result = self._model.transcribe(
-            str(audio_file_path), language="ja", verbose=False
+        segments, info = self._model.transcribe(
+            str(audio_file_path), language="ja", beam_size=5
         )
 
+        segments_list: List[Dict[str, Any]] = []
+        full_text = ""
+
+        for segment in segments:
+            segment_dict = {
+                "start": segment.start,
+                "end": segment.end,
+                "text": segment.text.strip(),
+            }
+            segments_list.append(segment_dict)
+            full_text += segment.text.strip() + " "
+
         return {
-            "text": result["text"].strip(),
-            "language": result["language"],
-            "segments": [
-                {
-                    "start": segment["start"],
-                    "end": segment["end"],
-                    "text": segment["text"].strip(),
-                }
-                for segment in result["segments"]
-            ],
+            "text": full_text.strip(),
+            "language": info.language,
+            "segments": segments_list,
         }
 
-    def transcribe_bytes(self, audio_bytes: bytes) -> Dict[str, str]:
+    def transcribe_bytes(self, audio_bytes: bytes) -> Dict[str, Any]:
         """Transcribe audio from bytes data.
 
         Args:
