@@ -31,20 +31,20 @@ RecordNote is a local Japanese voice-to-text meeting minutes application with a 
 
 ### Core Processing Pipeline
 1. **AudioRecorder** (`recorder.py`) - Captures real-time audio using sounddevice, stores in memory as numpy arrays
-2. **SpeechTranscriber** (`transcriber.py`) - Processes audio through OpenAI Whisper for Japanese speech recognition
+2. **SpeechTranscriber** (`transcriber.py`) - Processes audio through Faster Whisper for Japanese speech recognition
 3. **MinutesFormatter** (`formatter.py`) - Converts transcribed text into structured meeting minutes with timestamps
 4. **RecordNoteApp** (`app.py`) - Streamlit web interface orchestrating the entire workflow
 
 ### Key Design Patterns
 - **State Management**: Streamlit session state manages recording workflow (`recording_state`: stopped/recording/processing/completed)
 - **Threaded Recording**: Audio capture runs in separate thread to avoid blocking UI
-- **Lazy Loading**: Whisper model loaded on-demand to reduce startup time
+- **Lazy Loading**: Faster Whisper model loaded on-demand to reduce startup time
 - **Modular Pipeline**: Each component can be used independently for testing/debugging
 
 ### Critical Implementation Details
 - **Audio Format**: Uses WAV format internally, 44.1kHz sample rate, mono channel
 - **Memory Management**: Audio stored as list of numpy chunks during recording, concatenated for processing
-- **Japanese Optimization**: Whisper explicitly configured for Japanese language (`language="ja"`)
+- **Japanese Optimization**: Faster Whisper explicitly configured for Japanese language (`language="ja"`)
 - **Temporary Files**: Uses Python tempfile for Whisper processing, automatically cleaned up
 
 ### Configuration
