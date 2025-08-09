@@ -123,7 +123,9 @@ class MinutesFormatter:
         formatted_sentences = []
 
         for i in range(0, len(sentences) - 1, 2):
-            sentence = sentences[i] + (sentences[i + 1] if i + 1 < len(sentences) else "")
+            sentence = sentences[i] + (
+                sentences[i + 1] if i + 1 < len(sentences) else ""
+            )
             if sentence.strip():
                 formatted_sentences.append(sentence.strip())
 

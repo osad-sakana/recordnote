@@ -10,7 +10,7 @@ poetry install                          # Install all dependencies
 poetry shell                           # Activate virtual environment
 
 # Run the application
-streamlit run main.py                   # Start the web application
+python main.py                          # Start the Kivy desktop application
 
 # Code quality and testing
 poetry run mypy src/                    # Type checking
@@ -33,13 +33,14 @@ RecordNote is a local Japanese voice-to-text meeting minutes application with a 
 1. **AudioRecorder** (`recorder.py`) - Captures real-time audio using sounddevice, stores in memory as numpy arrays
 2. **SpeechTranscriber** (`transcriber.py`) - Processes audio through Faster Whisper for Japanese speech recognition
 3. **MinutesFormatter** (`formatter.py`) - Converts transcribed text into structured meeting minutes with timestamps
-4. **RecordNoteApp** (`app.py`) - Streamlit web interface orchestrating the entire workflow
+4. **RecordNoteKivyApp** (`kivy_app.py`) - Kivy desktop application interface orchestrating the entire workflow
 
 ### Key Design Patterns
-- **State Management**: Streamlit session state manages recording workflow (`recording_state`: stopped/recording/processing/completed)
+- **State Management**: Kivy app manages recording workflow (`recording_state`: stopped/recording/processing/completed)
 - **Threaded Recording**: Audio capture runs in separate thread to avoid blocking UI
 - **Lazy Loading**: Faster Whisper model loaded on-demand to reduce startup time
 - **Modular Pipeline**: Each component can be used independently for testing/debugging
+- **Cross-Platform**: Kivy provides native desktop application experience across platforms
 
 ### Critical Implementation Details
 - **Audio Format**: Uses WAV format internally, 44.1kHz sample rate, mono channel
@@ -50,10 +51,12 @@ RecordNote is a local Japanese voice-to-text meeting minutes application with a 
 ### Configuration
 - **Whisper Models**: Configurable model size (tiny/base/small/medium/large) balancing speed vs accuracy
 - **Audio Settings**: Sample rate and channels configurable in AudioRecorder constructor
+- **UI Theming**: Kivy Material Design themes configurable in KivyMD
 - **Type Safety**: Strict mypy configuration with `disallow_untyped_defs=true`
 
 ### Development Notes
-- Python 3.9+ required (excludes 3.9.7 due to Streamlit incompatibility)
+- Python 3.9+ required (excludes 3.9.7 due to potential compatibility issues)
 - All external libraries have type stub ignores in mypy config
 - Pre-commit hooks enforce black (88 char), isort (black profile), flake8, and mypy
 - Tests focus on formatter logic due to external dependencies in other modules
+- Kivy requires OpenGL support for rendering (usually available by default)

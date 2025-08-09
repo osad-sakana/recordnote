@@ -8,7 +8,9 @@ packages = [{include = "recordnote", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.9.7 || >3.9.7,<4.0"
-streamlit = "^1.28.0"
+kivy = "^2.3.0"
+kivymd = "^1.2.0"
+plyer = "^2.1.0"
 sounddevice = "^0.4.6"
 faster-whisper = "^1.0.0"
 numpy = "^1.24.0"
@@ -71,11 +73,10 @@ show_error_codes = true
 module = [
     "sounddevice",
     "faster_whisper",
-    "streamlit.*"
+    "kivy.*",
+    "kivymd.*",
+    "plyer.*",
+    "scipy.*"
 ]
 ignore_missing_imports = true
 
-[tool.flake8]
-max-line-length = 88
-extend-ignore = ["E203", "W503"]
-exclude = [".git", "__pycache__", "build", "dist", ".venv"]

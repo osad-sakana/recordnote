@@ -2,7 +2,7 @@
 
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from faster_whisper import WhisperModel
 
@@ -23,7 +23,9 @@ class SpeechTranscriber:
         """Load the Whisper model. Called automatically when needed."""
         if self._model is None:
             print(f"Loading Faster Whisper model: {self.model_size}")
-            self._model = WhisperModel(self.model_size, device="cpu", compute_type="int8")
+            self._model = WhisperModel(
+                self.model_size, device="cpu", compute_type="int8"
+            )
 
     def transcribe_file(self, audio_file_path: Path) -> Dict[str, Any]:
         """Transcribe audio file to text.
@@ -83,7 +85,7 @@ class SpeechTranscriber:
             # Clean up temporary file
             temp_path.unlink(missing_ok=True)
 
-    def get_model_info(self) -> Dict[str, str]:
+    def get_model_info(self) -> Dict[str, Union[str, bool]]:
         """Get information about the loaded model.
 
         Returns:

@@ -7,7 +7,14 @@
       "Bash(poetry install:*)",
       "Bash(python:*)",
       "Bash(rm:*)",
-      "Bash(poetry lock:*)"
+      "Bash(poetry lock:*)",
+      "Bash(poetry run mypy:*)",
+      "Bash(poetry run black:*)",
+      "Bash(poetry run isort:*)",
+      "Bash(poetry run flake8:*)",
+      "Bash(poetry add:*)",
+      "Bash(poetry remove:*)",
+      "Bash(poetry run:*)"
     ],
     "deny": []
   }
