@@ -51,7 +51,8 @@ RecordNote is a local Japanese voice-to-text meeting minutes application with a 
 ### Configuration
 - **Whisper Models**: Configurable model size (tiny/base/small/medium/large) balancing speed vs accuracy
 - **Audio Settings**: Sample rate and channels configurable in AudioRecorder constructor
-- **UI Theming**: Kivy Material Design themes configurable in KivyMD
+- **UI Theming**: Kivy Material Design themes configurable in KivyMD 2.0.1
+- **Japanese Fonts**: Automatic Japanese font support via japanize-kivy package
 - **Type Safety**: Strict mypy configuration with `disallow_untyped_defs=true`
 
 ### Development Notes

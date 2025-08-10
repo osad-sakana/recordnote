@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
+import japanize_kivy
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
@@ -15,14 +16,13 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
-from kivymd.uix.spinner import MDSpinner
+from kivymd.uix.progressindicator import MDCircularProgressIndicator
 from kivymd.uix.textfield import MDTextField
 from plyer import filechooser
 
-from .font_manager import font_manager
 from .formatter import MinutesFormatter
 from .recorder import AudioRecorder
 from .transcriber import SpeechTranscriber
@@ -47,22 +47,22 @@ class RecordNoteKivyApp(MDApp):
 
         # UI components (will be set in build method)
         self.meeting_title_input: Optional[MDTextField] = None
-        self.record_button: Optional[MDRaisedButton] = None
-        self.stop_button: Optional[MDRaisedButton] = None
+        self.record_button: Optional[MDButton] = None
+        self.stop_button: Optional[MDButton] = None
         self.duration_label: Optional[MDLabel] = None
         self.status_label: Optional[MDLabel] = None
         self.model_spinner: Optional[Spinner] = None
         self.results_text: Optional[TextInput] = None
-        self.download_button: Optional[MDRaisedButton] = None
-        self.new_recording_button: Optional[MDRaisedButton] = None
-        self.progress_spinner: Optional[MDSpinner] = None
+        self.download_button: Optional[MDButton] = None
+        self.new_recording_button: Optional[MDButton] = None
+        self.progress_spinner: Optional[MDCircularProgressIndicator] = None
 
         # Scheduled events
         self.duration_update_event: Optional[Any] = None
 
     def build(self) -> BoxLayout:
         """Build the main UI layout."""
-        # Configure KivyMD theme 
+        # Configure KivyMD theme
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Blue"
         self.theme_cls.material_style = "M3"  # Material Design 3
@@ -71,7 +71,7 @@ class RecordNoteKivyApp(MDApp):
         Window.size = (1200, 800)
         Window.minimum_width = 800
         Window.minimum_height = 600
-        self.title = "RecordNote - Meeting Minutes App"
+        self.title = "RecordNote - 議事録作成アプリ"
 
         # Main layout
         main_layout = BoxLayout(orientation="horizontal", padding=20, spacing=20)
@@ -94,9 +94,9 @@ class RecordNoteKivyApp(MDApp):
 
         # Title
         title_label = MDLabel(
-            text="Recording Controls",
+            text="録音コントロール",
             theme_text_color="Primary",
-            font_style="H5",
+            font_style="Headline",
             size_hint_y=None,
             height="48dp",
         )
@@ -104,14 +104,9 @@ class RecordNoteKivyApp(MDApp):
 
         # Meeting title input
         self.meeting_title_input = MDTextField(
-            hint_text="Meeting Name (Optional)",
-            helper_text="Example: Weekly Team Meeting",
-            hint_text_color_normal=(0.6, 0.6, 0.6, 1),  # Gray hint text
-            hint_text_color_focus=(0.4, 0.4, 0.4, 1),  # Darker gray when focused
-            helper_text_color_normal=(0.5, 0.5, 0.5, 1),  # Gray helper text
-            text_color_normal=(0, 0, 0, 1),  # Black input text
+            hint_text="会議名（オプション）",
             size_hint_y=None,
-            height="80dp",  # Increased height for helper text
+            height="48dp",
         )
         layout.add_widget(self.meeting_title_input)
 
@@ -134,7 +129,7 @@ class RecordNoteKivyApp(MDApp):
 
         # Status label
         self.status_label = MDLabel(
-            text="Ready to Record",
+            text="録音待機中",
             theme_text_color="Secondary",
             halign="center",
             size_hint_y=None,
@@ -144,7 +139,7 @@ class RecordNoteKivyApp(MDApp):
 
         # Duration label
         self.duration_label = MDLabel(
-            text="Recording Time: 0.0s",
+            text="録音時間: 0.0秒",
             theme_text_color="Secondary",
             halign="center",
             size_hint_y=None,
@@ -153,19 +148,18 @@ class RecordNoteKivyApp(MDApp):
         layout.add_widget(self.duration_label)
 
         # Record button
-        self.record_button = MDRaisedButton(
-            text="🔴 Start Recording", size_hint_y=None, height="48dp"
-        )
+        self.record_button = MDButton(size_hint_y=None, height="48dp")
+        self.record_button.add_widget(MDButtonText(text="🔴 録音開始"))
         self.record_button.bind(on_release=self.start_recording)
         layout.add_widget(self.record_button)
 
         # Stop button (initially hidden)
-        self.stop_button = MDRaisedButton(
-            text="⏹️ Stop Recording",
+        self.stop_button = MDButton(
             size_hint_y=None,
             height="48dp",
             disabled=True,
         )
+        self.stop_button.add_widget(MDButtonText(text="⏹️ 録音停止"))
         self.stop_button.bind(on_release=self.stop_recording)
         layout.add_widget(self.stop_button)
 
@@ -179,9 +173,9 @@ class RecordNoteKivyApp(MDApp):
 
         # Settings title
         settings_label = MDLabel(
-            text="Settings",
+            text="設定",
             theme_text_color="Primary",
-            font_style="H6",
+            font_style="Title",
             size_hint_y=None,
             height="40dp",
         )
@@ -192,9 +186,7 @@ class RecordNoteKivyApp(MDApp):
             orientation="vertical", size_hint_y=None, height="80dp", spacing=5
         )
 
-        model_label = Label(
-            text="Whisper Model", size_hint_y=None, height="30dp"
-        )
+        model_label = Label(text="Whisperモデル", size_hint_y=None, height="30dp")
         model_layout.add_widget(model_label)
 
         self.model_spinner = Spinner(
@@ -218,9 +210,9 @@ class RecordNoteKivyApp(MDApp):
 
         # Title
         title_label = MDLabel(
-            text="Results",
+            text="結果",
             theme_text_color="Primary",
-            font_style="H5",
+            font_style="Headline",
             size_hint_y=None,
             height="48dp",
         )
@@ -229,7 +221,7 @@ class RecordNoteKivyApp(MDApp):
         # Results text area
         scroll = ScrollView(size_hint=(1, 0.8))
         self.results_text = TextInput(
-            text="Start recording to convert speech to meeting minutes.",
+            text="録音を開始して音声を議事録に変換してください。",
             readonly=True,
             background_color=(1, 1, 1, 1),
             foreground_color=(0, 0, 0, 1),
@@ -249,33 +241,33 @@ class RecordNoteKivyApp(MDApp):
         )
 
         # Download button (initially disabled)
-        self.download_button = MDRaisedButton(
-            text="📄 Download Minutes",
+        self.download_button = MDButton(
             disabled=True,
             size_hint_x=None,
             width="200dp",
         )
+        self.download_button.add_widget(MDButtonText(text="📄 議事録をダウンロード"))
         self.download_button.bind(on_release=self.download_minutes)
         buttons_layout.add_widget(self.download_button)
 
         # New recording button (initially disabled)
-        self.new_recording_button = MDRaisedButton(
-            text="🔄 New Recording",
+        self.new_recording_button = MDButton(
             disabled=True,
             size_hint_x=None,
             width="200dp",
         )
+        self.new_recording_button.add_widget(MDButtonText(text="🔄 新しい録音を開始"))
         self.new_recording_button.bind(on_release=self.start_new_recording)
         buttons_layout.add_widget(self.new_recording_button)
 
         layout.add_widget(buttons_layout)
 
         # Progress spinner (initially hidden)
-        self.progress_spinner = MDSpinner(
+        self.progress_spinner = MDCircularProgressIndicator(
             size_hint=(None, None),
             size=("48dp", "48dp"),
             pos_hint={"center_x": 0.5},
-            active=False,
+            opacity=0,
         )
         layout.add_widget(self.progress_spinner)
 
@@ -295,7 +287,7 @@ class RecordNoteKivyApp(MDApp):
             )
 
         except Exception as e:
-            self._show_error(f"Recording start error: {e}")
+            self._show_error(f"録音開始エラー: {e}")
 
     def stop_recording(self, instance: Any) -> None:
         """Stop audio recording and process."""
@@ -313,7 +305,7 @@ class RecordNoteKivyApp(MDApp):
             threading.Thread(target=self._process_recording, daemon=True).start()
 
         except Exception as e:
-            self._show_error(f"Recording stop error: {e}")
+            self._show_error(f"録音停止エラー: {e}")
 
     def _process_recording(self) -> None:
         """Process the recorded audio and generate minutes."""
@@ -322,20 +314,20 @@ class RecordNoteKivyApp(MDApp):
             audio_bytes = self.recorder.get_audio_bytes()
 
             # Update UI on main thread
-            Clock.schedule_once(lambda dt: self._update_status("Recognizing speech..."), 0)
+            Clock.schedule_once(lambda dt: self._update_status("音声を認識中..."), 0)
 
             # Transcribe audio
             transcription_result = self.transcriber.transcribe_bytes(audio_bytes)
             self.transcribed_text = transcription_result["text"]
 
             # Update UI on main thread
-            Clock.schedule_once(lambda dt: self._update_status("Formatting minutes..."), 0)
+            Clock.schedule_once(lambda dt: self._update_status("議事録を整形中..."), 0)
 
             # Format minutes
             meeting_title = (
                 self.meeting_title_input.text
                 if self.meeting_title_input and self.meeting_title_input.text.strip()
-                else "Meeting Minutes"
+                else "会議録"
             )
             formatted_minutes = self.formatter.format_minutes(
                 transcription_result, meeting_title
@@ -348,7 +340,7 @@ class RecordNoteKivyApp(MDApp):
             Clock.schedule_once(self._update_ui_after_processing, 0)
 
         except Exception as ex:
-            Clock.schedule_once(lambda dt: self._show_error(f"Processing error: {ex}"), 0)
+            Clock.schedule_once(lambda dt: self._show_error(f"処理エラー: {ex}"), 0)
             self.recording_state = "stopped"
             Clock.schedule_once(lambda dt: self._update_ui_for_recording_state(), 0)
 
@@ -362,11 +354,11 @@ class RecordNoteKivyApp(MDApp):
             transcription_result = {"text": self.transcribed_text, "segments": []}
             stats = self.formatter.get_summary_stats(transcription_result)
             status_msg = (
-                f"✅ Complete! Characters: {stats['character_count']}, " f"Words: {stats['word_count']}"
+                f"✅ 完了! 文字数: {stats['character_count']}, " f"単語数: {stats['word_count']}"
             )
             self._update_status(status_msg)
         except Exception:
-            self._update_status("✅ Processing complete!")
+            self._update_status("✅ 処理完了!")
 
         self._update_ui_for_recording_state()
 
@@ -374,7 +366,7 @@ class RecordNoteKivyApp(MDApp):
         """Update the recording duration display."""
         if self.recorder.is_recording() and self.duration_label:
             duration = self.recorder.get_duration()
-            self.duration_label.text = f"Recording Time: {duration:.1f}s"
+            self.duration_label.text = f"録音時間: {duration:.1f}秒"
 
     def _update_ui_for_recording_state(self) -> None:
         """Update UI based on current recording state."""
@@ -384,12 +376,12 @@ class RecordNoteKivyApp(MDApp):
             if self.stop_button:
                 self.stop_button.disabled = True
             if self.progress_spinner:
-                self.progress_spinner.active = False
+                self.progress_spinner.opacity = 0
             if self.download_button:
                 self.download_button.disabled = True
             if self.new_recording_button:
                 self.new_recording_button.disabled = True
-            self._update_status("Ready to Record")
+            self._update_status("録音待機中")
 
         elif self.recording_state == "recording":
             if self.record_button:
@@ -397,8 +389,8 @@ class RecordNoteKivyApp(MDApp):
             if self.stop_button:
                 self.stop_button.disabled = False
             if self.progress_spinner:
-                self.progress_spinner.active = False
-            self._update_status("🎤 Recording...")
+                self.progress_spinner.opacity = 0
+            self._update_status("🎤 録音中...")
 
         elif self.recording_state == "processing":
             if self.record_button:
@@ -406,8 +398,8 @@ class RecordNoteKivyApp(MDApp):
             if self.stop_button:
                 self.stop_button.disabled = True
             if self.progress_spinner:
-                self.progress_spinner.active = True
-            self._update_status("🔄 Processing audio...")
+                self.progress_spinner.opacity = 1
+            self._update_status("🔄 音声を処理中...")
 
         elif self.recording_state == "completed":
             if self.record_button:
@@ -415,7 +407,7 @@ class RecordNoteKivyApp(MDApp):
             if self.stop_button:
                 self.stop_button.disabled = True
             if self.progress_spinner:
-                self.progress_spinner.active = False
+                self.progress_spinner.opacity = 0
             if self.download_button:
                 self.download_button.disabled = False
             if self.new_recording_button:
@@ -443,7 +435,7 @@ class RecordNoteKivyApp(MDApp):
 
             # Open file chooser
             path = filechooser.save_file(
-                title="Save Meeting Minutes",
+                title="議事録を保存",
                 filters=[("Markdown files", "*.md"), ("All files", "*.*")],
                 path=filename,
             )
@@ -452,10 +444,10 @@ class RecordNoteKivyApp(MDApp):
                 # Save the file
                 save_path = Path(path[0]) if isinstance(path, list) else Path(path)
                 self.formatter.export_to_file(self.formatted_minutes, str(save_path))
-                self._show_info(f"File saved: {save_path.name}")
+                self._show_info(f"ファイルを保存しました: {save_path.name}")
 
         except Exception as e:
-            self._show_error(f"File save error: {e}")
+            self._show_error(f"ファイル保存エラー: {e}")
 
     def start_new_recording(self, instance: Any) -> None:
         """Reset for a new recording."""
@@ -464,18 +456,18 @@ class RecordNoteKivyApp(MDApp):
         self.formatted_minutes = ""
 
         if self.results_text:
-            self.results_text.text = "Start recording to convert speech to meeting minutes."
+            self.results_text.text = "録音を開始して音声を議事録に変換してください。"
         if self.meeting_title_input:
             self.meeting_title_input.text = ""
         if self.duration_label:
-            self.duration_label.text = "Recording Time: 0.0s"
+            self.duration_label.text = "録音時間: 0.0秒"
 
         self._update_ui_for_recording_state()
 
     def _show_error(self, message: str) -> None:
         """Show an error popup."""
         popup = Popup(
-            title="Error",
+            title="エラー",
             content=Label(text=message),
             size_hint=(0.6, 0.4),
         )
@@ -484,7 +476,7 @@ class RecordNoteKivyApp(MDApp):
     def _show_info(self, message: str) -> None:
         """Show an info popup."""
         popup = Popup(
-            title="Information",
+            title="情報",
             content=Label(text=message),
             size_hint=(0.6, 0.4),
         )

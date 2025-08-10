@@ -14,7 +14,8 @@
 ## 技術スタック
 
 - **Python 3.9+**
-- **Kivy & KivyMD**: クロスプラットフォームデスクトップUI
+- **Kivy & KivyMD**: クロスプラットフォームデスクトップUI（KivyMD 2.0.1使用）
+- **japanize-kivy**: 日本語フォント自動対応
 - **Faster Whisper**: 軽量で高速なローカル音声認識
 - **sounddevice**: 音声録音
 - **plyer**: ネイティブファイルダイアログとシステム連携

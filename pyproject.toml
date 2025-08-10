@@ -15,6 +15,7 @@ sounddevice = "^0.4.6"
 faster-whisper = "^1.0.0"
 numpy = "^1.24.0"
 scipy = "^1.11.0"
+japanize-kivy = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.0.0"
@@ -76,7 +77,8 @@ module = [
     "kivy.*",
     "kivymd.*",
     "plyer.*",
-    "scipy.*"
+    "scipy.*",
+    "japanize_kivy.*"
 ]
 ignore_missing_imports = true
 
