@@ -14,7 +14,12 @@
       "Bash(poetry run flake8:*)",
       "Bash(poetry add:*)",
       "Bash(poetry remove:*)",
-      "Bash(poetry run:*)"
+      "Bash(poetry run:*)",
+      "Bash(cargo check:*)",
+      "Bash(cargo test)",
+      "Bash(cargo test:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo run:*)"
     ],
     "deny": []
   }

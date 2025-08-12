@@ -1,0 +1,42 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Audio files
+*.wav
+*.mp3
+*.aac
+recordings/
+
+# Logs
+*.log
+
+# Model files
+models/
+*.bin
+*.safetensors
+
+# Output files
+output/
+minutes_*.md
+
+# Temporary files
+tmp/
+temp/
